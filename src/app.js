@@ -19,6 +19,7 @@ import {
   renderAvatarSheet,
   renderDialog,
   renderBottomNav,
+  renderInstallButton,
   showToast,
 } from './ui.js';
 
@@ -218,10 +219,6 @@ function wireHome() {
     if (Storage.getStampCount() >= MAX_STAMPS) {
       goTo('reward');
     }
-  });
-
-  document.getElementById('btn-install-app')?.addEventListener('click', () => {
-    triggerInstall();
   });
 }
 
@@ -596,8 +593,19 @@ function playCelebration() {
    Boot
    ========================================================================== */
 
+function mountInstallButton() {
+  if (document.getElementById('btn-install-app')) return;
+  const wrapper = document.createElement('div');
+  wrapper.innerHTML = renderInstallButton();
+  document.body.appendChild(wrapper.firstElementChild);
+  document.getElementById('btn-install-app')?.addEventListener('click', () => {
+    triggerInstall();
+  });
+}
+
 function boot() {
   renderApp();
+  mountInstallButton();
 
   // Register service worker for PWA/offline support
   if ('serviceWorker' in navigator) {

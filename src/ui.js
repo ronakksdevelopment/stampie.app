@@ -124,14 +124,12 @@ export function renderHome({ profile, stampCount, completedCount }) {
       <div class="top-bar">
         <span class="top-bar-spacer" aria-hidden="true"></span>
         ${completedCount > 0 ? `<span class="text-muted" style="font-size:0.82rem; font-weight:700; display:flex; align-items:center; gap:6px;"><i class="fa-solid fa-trophy" style="color:var(--accent);"></i>${completedCount} redeemed</span>` : ''}
-        <button type="button" class="icon-btn install-btn" id="btn-install-app" aria-label="Install app" title="Install app">
-          <i class="fa-solid fa-arrow-up-from-bracket"></i>
-        </button>
+        <span class="top-bar-spacer" aria-hidden="true"></span>
       </div>
 
       <img src="${ASSET.banner}" alt="Divika Cakes" class="banner-art" />
 
-      <p class="text-center" style="font-weight:700; font-size:1.15rem; margin-bottom: 20px; display:flex; align-items:center; justify-content:center; gap:8px;">
+      <p class="text-center" style="font-weight:700; font-size:1.15rem; margin-bottom: 12px; display:flex; align-items:center; justify-content:center; gap:8px;">
         Hello, ${escapeHtml(firstName)}! <i class="fa-solid fa-hand-sparkles" style="color:var(--accent);"></i>
       </p>
 
@@ -499,6 +497,18 @@ export function renderDialog({ icon = 'fa-circle-question', title = '', message 
         </div>
       </div>
     </div>
+  `;
+}
+
+/* ==========================================================================
+   Floating install button - rendered once, stays fixed on every screen
+   ========================================================================== */
+
+export function renderInstallButton() {
+  return `
+    <button type="button" class="install-btn-floating" id="btn-install-app" aria-label="Install app" title="Install app">
+      <i class="fa-solid fa-arrow-up-from-bracket"></i>
+    </button>
   `;
 }
 
