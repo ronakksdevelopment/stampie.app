@@ -179,45 +179,24 @@ function wireHome() {
 }
 
 /* ==========================================================================
-   Manual code entry - OTP boxes + custom keypad
+   Manual code entry - OTP boxes (real inputs, system keyboard, auto-advance)
    ========================================================================== */
 
 function wireManualEntry(extra) {
   document.getElementById('btn-close-manual')?.addEventListener('click', () => goTo('collection'));
 
   const form = document.getElementById('manual-entry-form');
-  const hiddenInput = document.getElementById('input-code');
   const otpBoxes = Array.from(document.querySelectorAll('.otp-box'));
   const submitBtn = document.getElementById('btn-submit-code');
 
   function currentValue() {
-    return normalizeCode(hiddenInput.value || '');
+    return normalizeCode(otpBoxes.map((box) => box.value || '').join(''));
   }
 
-  function syncBoxes() {
-    const val = currentValue();
-    otpBoxes.forEach((box, i) => {
-      const ch = val[i];
-      box.classList.toggle('is-filled', Boolean(ch));
-      box.classList.toggle('is-hidden-char', Boolean(ch) && codeHidden);
-      box.innerHTML = ch ? (codeHidden ? '&bull;' : ch) : '';
-    });
-  }
-
-  function appendChar(ch) {
-    if (codeSubmitting) return;
-    const val = currentValue();
-    if (val.length >= CODE_LENGTH) return;
-    hiddenInput.value = val + ch;
-    syncBoxes();
-  }
-
-  function backspace() {
-    if (codeSubmitting) return;
-    const val = currentValue();
-    if (!val.length) return;
-    hiddenInput.value = val.slice(0, -1);
-    syncBoxes();
+  function focusBox(index) {
+    const box = otpBoxes[Math.max(0, Math.min(index, otpBoxes.length - 1))];
+    box?.focus();
+    box?.select?.();
   }
 
   function shakeAndClear(msg) {
@@ -226,45 +205,55 @@ function wireManualEntry(extra) {
     if (msg) showToast(msg, 'error');
   }
 
-  // Custom on-screen keypad (independent of system keyboard, works everywhere)
-  document.getElementById('keypad')?.addEventListener('click', (e) => {
-    const keyBtn = e.target.closest('[data-key]');
-    if (keyBtn) {
-      appendChar(keyBtn.dataset.key);
-      return;
-    }
-    if (e.target.closest('#keypad-backspace')) {
-      backspace();
-    }
-  });
+  otpBoxes.forEach((box, i) => {
+    box.addEventListener('input', () => {
+      // Keep only the last typed character, uppercase, alphanumeric only
+      const cleaned = normalizeCode(box.value).slice(-1);
+      box.value = cleaned;
+      box.classList.toggle('is-filled', Boolean(cleaned));
 
-  // Also allow a physical keyboard (desktop) to type into the OTP boxes
-  document.addEventListener('keydown', handlePhysicalKeydown);
-  function handlePhysicalKeydown(e) {
-    if (currentTab !== 'manual') {
-      document.removeEventListener('keydown', handlePhysicalKeydown);
-      return;
-    }
-    if (e.key === 'Backspace') {
+      if (cleaned && i < otpBoxes.length - 1) {
+        focusBox(i + 1);
+      }
+    });
+
+    box.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' && !box.value && i > 0) {
+        e.preventDefault();
+        focusBox(i - 1);
+        otpBoxes[i - 1].value = '';
+        otpBoxes[i - 1].classList.remove('is-filled');
+      } else if (e.key === 'ArrowLeft' && i > 0) {
+        e.preventDefault();
+        focusBox(i - 1);
+      } else if (e.key === 'ArrowRight' && i < otpBoxes.length - 1) {
+        e.preventDefault();
+        focusBox(i + 1);
+      }
+    });
+
+    box.addEventListener('paste', (e) => {
       e.preventDefault();
-      backspace();
-    } else if (/^[a-zA-Z0-9]$/.test(e.key)) {
-      e.preventDefault();
-      appendChar(e.key.toUpperCase());
-    }
-  }
+      const pasted = normalizeCode((e.clipboardData || window.clipboardData).getData('text')).slice(0, CODE_LENGTH);
+      otpBoxes.forEach((b, idx) => {
+        b.value = pasted[idx] || '';
+        b.classList.toggle('is-filled', Boolean(pasted[idx]));
+      });
+      focusBox(Math.min(pasted.length, otpBoxes.length - 1));
+    });
+
+    box.addEventListener('focus', () => box.select());
+  });
 
   document.getElementById('btn-toggle-visibility')?.addEventListener('click', () => {
     codeHidden = !codeHidden;
     renderCurrentTab({ value: currentValue(), errorMsg: extra.errorMsg || '' });
+    focusBox(currentValue().length < CODE_LENGTH ? currentValue().length : CODE_LENGTH - 1);
   });
 
-  otpBoxes.forEach((box) => {
-    box.addEventListener('click', () => {
-      // Tapping a box focuses the entry flow without opening the system keyboard.
-      box.focus?.();
-    });
-  });
+  // Auto-focus the first empty box so the system keyboard appears right away
+  const firstEmptyIndex = otpBoxes.findIndex((box) => !box.value);
+  focusBox(firstEmptyIndex === -1 ? otpBoxes.length - 1 : firstEmptyIndex);
 
   form?.addEventListener('submit', (e) => {
     e.preventDefault();

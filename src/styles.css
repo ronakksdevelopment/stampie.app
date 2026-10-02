@@ -677,7 +677,6 @@ a { color: inherit; }
   height: 84px;
   border-radius: var(--radius-lg);
   background: var(--bg);
-  border: 2.5px solid var(--ink);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -702,11 +701,13 @@ a { color: inherit; }
   font-family: var(--font-display);
   font-size: 1.5rem;
   font-weight: 700;
+  line-height: 1;
   text-align: center;
+  text-align-last: center;
+  padding: 0;
   color: var(--ink);
   text-transform: uppercase;
   outline: none;
-  caret-color: transparent;
   transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
 }
 
@@ -719,11 +720,6 @@ a { color: inherit; }
   border-color: var(--accent);
   box-shadow: 0 0 0 4px rgba(205, 134, 110, 0.18);
   transform: translateY(-2px);
-}
-
-.otp-box.is-hidden-char {
-  font-size: 2rem;
-  letter-spacing: 0;
 }
 
 .otp-box.is-shake {
@@ -764,46 +760,6 @@ a { color: inherit; }
 }
 
 .otp-visibility-toggle:active { transform: scale(0.95); }
-
-/* Custom on-screen keypad for the code entry (no system keyboard needed) */
-.keypad {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-2);
-  margin-top: auto;
-  padding-top: var(--space-4);
-}
-
-.keypad-key {
-  background: var(--white);
-  border: 2.5px solid var(--highlight);
-  border-radius: var(--radius-md);
-  min-height: 54px;
-  font-family: var(--font-display);
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--ink);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.1s ease, background 0.1s ease;
-}
-
-.keypad-key:active {
-  transform: scale(0.93);
-  background: var(--bg);
-}
-
-.keypad-key.keypad-key-backspace {
-  background: var(--bg);
-  color: var(--accent);
-  font-size: 1.3rem;
-}
-
-.keypad-key.keypad-key-empty {
-  visibility: hidden;
-  pointer-events: none;
-}
 
 /* ==========================================================================
    Success / celebration overlay

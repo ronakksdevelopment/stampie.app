@@ -189,7 +189,7 @@ export function renderHome({ profile, stampCount, completedCount }) {
 }
 
 /* ==========================================================================
-   Manual code entry - OTP style boxes + custom keypad
+   Manual code entry - OTP style boxes (real inputs, system keyboard)
    (there is no camera-based scanner in this app)
    ========================================================================== */
 
@@ -198,18 +198,22 @@ export function renderManualEntry({ value = '', errorMsg = '', hidden = false } 
 
   const boxes = chars.map((ch, i) => {
     const filled = ch !== ' ';
-    const display = filled ? (hidden ? '&bull;' : escapeHtml(ch)) : '';
+    const display = filled ? escapeHtml(ch) : '';
+    const inputType = hidden && filled ? 'password' : 'text';
     return `
-      <div class="otp-box ${filled ? 'is-filled' : ''} ${hidden && filled ? 'is-hidden-char' : ''}" data-otp-index="${i}">${display}</div>
+      <input
+        type="${inputType}"
+        class="otp-box ${filled ? 'is-filled' : ''}"
+        id="otp-box-${i}"
+        data-otp-index="${i}"
+        value="${display}"
+        maxlength="1"
+        inputmode="text"
+        autocomplete="off"
+        autocapitalize="characters"
+        spellcheck="false"
+      />
     `;
-  }).join('');
-
-  const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', '0', 'back'];
-  const keypadButtons = keys.map((k) => {
-    if (k === 'back') {
-      return `<button type="button" class="keypad-key keypad-key-backspace" id="keypad-backspace" aria-label="Delete last character"><i class="fa-solid fa-delete-left"></i></button>`;
-    }
-    return `<button type="button" class="keypad-key" data-key="${k}">${k}</button>`;
   }).join('');
 
   return `
@@ -234,7 +238,6 @@ export function renderManualEntry({ value = '', errorMsg = '', hidden = false } 
         <div class="otp-row" id="otp-row">
           ${boxes}
         </div>
-        <input type="text" id="input-code" value="${escapeHtml(value)}" maxlength="${CODE_LENGTH}" style="position:absolute; opacity:0; height:0; width:0; pointer-events:none;" autocomplete="off" aria-hidden="true" tabindex="-1" />
 
         ${errorMsg ? `<p class="error text-center" id="manual-entry-error" style="justify-content:center; margin-bottom: var(--space-3);"><i class="fa-solid fa-circle-exclamation"></i>&nbsp;${escapeHtml(errorMsg)}</p>` : ''}
 
@@ -250,10 +253,6 @@ export function renderManualEntry({ value = '', errorMsg = '', hidden = false } 
           Submit Code
         </button>
       </form>
-
-      <div class="keypad" id="keypad" aria-label="Code keypad">
-        ${keypadButtons}
-      </div>
     </div>
   `;
 }
