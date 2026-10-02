@@ -1,12 +1,12 @@
 /**
- * Stampie — Service Worker
+ * Stampie - Service Worker
  * ---------------------------------------------------------------------------
  * Caches the app shell for offline use. Codes.json is cached too but with a
  * network-first strategy so new codes added by the shop owner are picked up
  * as soon as the customer is back online.
  */
 
-const CACHE_NAME = 'stampie-cache-v1';
+const CACHE_NAME = 'stampie-cache-v2';
 const APP_SHELL = [
   './',
   './index.html',
@@ -16,7 +16,6 @@ const APP_SHELL = [
   './src/ui.js',
   './src/storage.js',
   './src/codes.js',
-  './src/scanner.js',
   './src/constants.js',
   './assets/final_logo.png',
   './assets/notxt_character_logo.png',
@@ -87,5 +86,5 @@ self.addEventListener('fetch', (event) => {
       })
     );
   }
-  // Cross-origin (fonts, CDN scripts) — just let the network handle it, browser caches normally.
+  // Cross-origin (fonts, CDN scripts): just let the network handle it, browser caches normally.
 });

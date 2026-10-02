@@ -1,5 +1,5 @@
 /**
- * Stampie — Cake Code Generator (developer helper, not shipped to customers)
+ * Stampie - Cake Code Generator (developer helper, not shipped to customers)
  * ---------------------------------------------------------------------------
  * Generates random, unambiguous 6-character alphanumeric codes for new cake
  * boxes. Run this with Node.js whenever you need a fresh batch of codes to

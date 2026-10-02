@@ -1,13 +1,13 @@
 {
-  "name": "Stampie — Divika Cakes Loyalty Card",
+  "name": "Stampie - Divika Cakes Loyalty Card",
   "short_name": "Stampie",
   "description": "Collect stamps with every Divika Cakes purchase and unlock a sweet surprise.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#FEE6DE",
-  "theme_color": "#FEE6DE",
+  "background_color": "#FDE5D5",
+  "theme_color": "#FDE5D5",
   "icons": [
     { "src": "icons/icon-72.png", "sizes": "72x72", "type": "image/png", "purpose": "any" },
     { "src": "icons/icon-96.png", "sizes": "96x96", "type": "image/png", "purpose": "any" },

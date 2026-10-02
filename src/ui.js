@@ -1,17 +1,19 @@
 /**
- * Stampie — UI Rendering
+ * Stampie - UI Rendering
  * ---------------------------------------------------------------------------
  * Pure-ish render functions that build HTML strings / DOM for each screen.
  * app.js owns the router and wires up event listeners after render.
  */
 
-import { MAX_STAMPS, MOTIVATION_MESSAGES, GENDER_OPTIONS, REWARD_CONTACT_DISPLAY } from './constants.js';
+import { MAX_STAMPS, CODE_LENGTH, MOTIVATION_MESSAGES, GENDER_OPTIONS } from './constants.js';
 
 const ASSET = {
   finalLogo: 'assets/final_logo.png',
   character: 'assets/notxt_character_logo.png',
   banner: 'assets/text_banner.png',
 };
+
+const STAMP_ICON_CLASS = 'fa-solid fa-stamp';
 
 function escapeHtml(str) {
   const div = document.createElement('div');
@@ -68,14 +70,14 @@ export function renderOnboarding(values = {}, errors = {}) {
   return `
     <div class="screen screen--no-nav">
       <div class="onboard-hero">
-        <img src="${ASSET.finalLogo}" alt="Stampie — Divika Cakes loyalty card" />
+        <img src="${ASSET.finalLogo}" alt="Stampie, Divika Cakes loyalty card" />
       </div>
       <h1 class="onboard-title">Welcome to Stampie</h1>
       <p class="onboard-sub">Collect stamps with every cake and unlock a surprise!</p>
 
       <form id="onboarding-form" novalidate>
-        <div class="field">
-          <label for="input-name">Full name</label>
+        <div class="field field-with-icon">
+          <label for="input-name"><i class="fa-solid fa-user-pen" style="color:var(--accent); margin-right:6px;"></i>Full name</label>
           <input
             type="text"
             id="input-name"
@@ -85,11 +87,11 @@ export function renderOnboarding(values = {}, errors = {}) {
             autocomplete="name"
             required
           />
-          ${errors.name ? `<span class="error">${escapeHtml(errors.name)}</span>` : ''}
+          ${errors.name ? `<span class="error"><i class="fa-solid fa-circle-exclamation"></i>${escapeHtml(errors.name)}</span>` : ''}
         </div>
 
-        <div class="field">
-          <label for="input-phone">Phone number</label>
+        <div class="field field-with-icon">
+          <label for="input-phone"><i class="fa-solid fa-phone" style="color:var(--accent); margin-right:6px;"></i>Phone number</label>
           <input
             type="tel"
             id="input-phone"
@@ -100,19 +102,20 @@ export function renderOnboarding(values = {}, errors = {}) {
             autocomplete="tel"
             required
           />
-          <span class="hint">10-digit Indian mobile number</span>
-          ${errors.phone ? `<span class="error">${escapeHtml(errors.phone)}</span>` : ''}
+          <span class="hint"><i class="fa-solid fa-circle-info"></i>10-digit Indian mobile number</span>
+          ${errors.phone ? `<span class="error"><i class="fa-solid fa-circle-exclamation"></i>${escapeHtml(errors.phone)}</span>` : ''}
         </div>
 
         <div class="field">
-          <label id="gender-label">Gender</label>
+          <label id="gender-label"><i class="fa-solid fa-venus-mars" style="color:var(--accent); margin-right:6px;"></i>Gender</label>
           <div class="radio-group" role="radiogroup" aria-labelledby="gender-label">
             ${genderChips}
           </div>
-          ${errors.gender ? `<span class="error">${escapeHtml(errors.gender)}</span>` : ''}
+          ${errors.gender ? `<span class="error"><i class="fa-solid fa-circle-exclamation"></i>${escapeHtml(errors.gender)}</span>` : ''}
         </div>
 
         <button type="submit" class="btn btn-primary btn-block" style="margin-top: 8px;">
+          <i class="fa-solid fa-arrow-right"></i>
           Continue
         </button>
       </form>
@@ -131,7 +134,7 @@ function renderStampGrid(stampCount) {
     const isNew = i === stampCount - 1;
     circles += `
       <div class="stamp-circle ${filled ? 'is-filled' : 'is-empty'} ${isNew ? 'is-new' : ''}" aria-label="${filled ? 'Stamp collected' : 'Stamp not yet collected'}">
-        ${filled ? `<img src="${ASSET.character}" alt="" />` : ''}
+        ${filled ? `<i class="${STAMP_ICON_CLASS} stamp-icon" aria-hidden="true"></i>` : ''}
       </div>
     `;
   }
@@ -148,13 +151,13 @@ export function renderHome({ profile, stampCount, completedCount }) {
     <div class="screen">
       <div class="top-bar">
         <img src="${ASSET.finalLogo}" alt="Stampie" class="logo-mark" />
-        ${completedCount > 0 ? `<span class="text-muted" style="font-size:0.82rem; font-weight:700;">${completedCount} redeemed</span>` : ''}
+        ${completedCount > 0 ? `<span class="text-muted" style="font-size:0.82rem; font-weight:700; display:flex; align-items:center; gap:6px;"><i class="fa-solid fa-trophy" style="color:var(--accent);"></i>${completedCount} redeemed</span>` : ''}
       </div>
 
       <img src="${ASSET.banner}" alt="Divika Cakes" class="banner-art" />
 
-      <p class="text-center" style="font-weight:700; font-size:1.15rem; margin-bottom: 20px;">
-        Hello, ${escapeHtml(firstName)}! 👋
+      <p class="text-center" style="font-weight:700; font-size:1.15rem; margin-bottom: 20px; display:flex; align-items:center; justify-content:center; gap:8px;">
+        Hello, ${escapeHtml(firstName)}! <i class="fa-solid fa-hand-sparkles" style="color:var(--accent);"></i>
       </p>
 
       <div class="loyalty-card">
@@ -177,7 +180,8 @@ export function renderHome({ profile, stampCount, completedCount }) {
           ${isReady ? '' : 'disabled'}
           aria-disabled="${!isReady}"
         >
-          ${isReady ? '🎁 Unlock Surprise' : '🔒 Unlock Surprise'}
+          <i class="fa-solid ${isReady ? 'fa-gift' : 'fa-lock'}"></i>
+          Unlock Surprise
         </button>
       </div>
     </div>
@@ -185,68 +189,31 @@ export function renderHome({ profile, stampCount, completedCount }) {
 }
 
 /* ==========================================================================
-   Scanner screen
+   Manual code entry - OTP style boxes + custom keypad
+   (there is no camera-based scanner in this app)
    ========================================================================== */
 
-export function renderScanner({ cameraState = 'requesting' } = {}) {
-  // cameraState: 'requesting' | 'active' | 'denied' | 'unavailable'
-  const showVideo = cameraState === 'active' || cameraState === 'requesting';
+export function renderManualEntry({ value = '', errorMsg = '', hidden = false } = {}) {
+  const chars = value.padEnd(CODE_LENGTH, ' ').slice(0, CODE_LENGTH).split('');
+
+  const boxes = chars.map((ch, i) => {
+    const filled = ch !== ' ';
+    const display = filled ? (hidden ? '&bull;' : escapeHtml(ch)) : '';
+    return `
+      <div class="otp-box ${filled ? 'is-filled' : ''} ${hidden && filled ? 'is-hidden-char' : ''}" data-otp-index="${i}">${display}</div>
+    `;
+  }).join('');
+
+  const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', '0', 'back'];
+  const keypadButtons = keys.map((k) => {
+    if (k === 'back') {
+      return `<button type="button" class="keypad-key keypad-key-backspace" id="keypad-backspace" aria-label="Delete last character"><i class="fa-solid fa-delete-left"></i></button>`;
+    }
+    return `<button type="button" class="keypad-key" data-key="${k}">${k}</button>`;
+  }).join('');
 
   return `
-    <div class="screen">
-      <div class="top-bar">
-        <h2 style="font-size:1.3rem;">Scan your cake code</h2>
-        <button class="icon-btn" id="btn-close-scanner" aria-label="Close scanner">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
-      </div>
-
-      <p class="text-muted" style="font-weight:600; margin-bottom: 16px;">
-        Point your camera at the QR code on your cake box.
-      </p>
-
-      <div class="scanner-frame">
-        <video id="scanner-video" autoplay muted playsinline style="${showVideo && cameraState === 'active' ? '' : 'display:none;'}"></video>
-        <canvas id="scanner-canvas" style="display:none;"></canvas>
-
-        ${cameraState === 'active' ? `
-          <div class="scanner-reticle" aria-hidden="true"></div>
-          <div class="scan-line" aria-hidden="true"></div>
-        ` : ''}
-
-        ${cameraState === 'requesting' ? `
-          <div class="scanner-placeholder">
-            <i class="fa-solid fa-camera"></i>
-            <p>Starting camera…</p>
-          </div>
-        ` : ''}
-
-        ${cameraState === 'denied' ? `
-          <div class="scanner-placeholder">
-            <i class="fa-solid fa-camera-slash"></i>
-            <p>Camera access isn't available.<br/>You can enter your cake code manually below.</p>
-          </div>
-        ` : ''}
-
-        ${cameraState === 'unavailable' ? `
-          <div class="scanner-placeholder">
-            <i class="fa-solid fa-camera-slash"></i>
-            <p>Scanning isn't supported on this device.<br/>Enter your cake code manually below.</p>
-          </div>
-        ` : ''}
-      </div>
-
-      <button class="manual-entry-link" id="btn-manual-entry">
-        <i class="fa-solid fa-keyboard"></i>
-        Enter code manually
-      </button>
-    </div>
-  `;
-}
-
-export function renderManualEntry({ value = '', errorMsg = '' } = {}) {
-  return `
-    <div class="screen">
+    <div class="screen" style="display:flex; flex-direction:column;">
       <div class="top-bar">
         <h2 style="font-size:1.3rem;">Enter your code</h2>
         <button class="icon-btn" id="btn-close-manual" aria-label="Close">
@@ -254,32 +221,39 @@ export function renderManualEntry({ value = '', errorMsg = '' } = {}) {
         </button>
       </div>
 
-      <div class="card-outline mb-4" style="text-align:center;">
-        <img src="${ASSET.character}" alt="" style="width:72px;height:72px;object-fit:contain;margin:0 auto 12px;" />
+      <div class="code-hero mb-5">
+        <div class="code-hero-icon">
+          <i class="fa-solid fa-cake-candles"></i>
+        </div>
         <p class="text-muted" style="font-weight:600;">
           Find the 6-character code printed on your cake box.
         </p>
       </div>
 
       <form id="manual-entry-form" novalidate>
-        <div class="field">
-          <label for="input-code">Cake code</label>
-          <input
-            type="text"
-            id="input-code"
-            class="code-input"
-            value="${escapeHtml(value)}"
-            maxlength="6"
-            placeholder="A7K2P9"
-            autocomplete="off"
-            autocapitalize="characters"
-            spellcheck="false"
-            inputmode="text"
-          />
-          ${errorMsg ? `<span class="error" id="manual-entry-error">${escapeHtml(errorMsg)}</span>` : ''}
+        <div class="otp-row" id="otp-row">
+          ${boxes}
         </div>
-        <button type="submit" class="btn btn-primary btn-block">Submit Code</button>
+        <input type="text" id="input-code" value="${escapeHtml(value)}" maxlength="${CODE_LENGTH}" style="position:absolute; opacity:0; height:0; width:0; pointer-events:none;" autocomplete="off" aria-hidden="true" tabindex="-1" />
+
+        ${errorMsg ? `<p class="error text-center" id="manual-entry-error" style="justify-content:center; margin-bottom: var(--space-3);"><i class="fa-solid fa-circle-exclamation"></i>&nbsp;${escapeHtml(errorMsg)}</p>` : ''}
+
+        <div class="otp-visibility-row">
+          <button type="button" class="otp-visibility-toggle" id="btn-toggle-visibility">
+            <i class="fa-solid ${hidden ? 'fa-eye' : 'fa-eye-slash'}"></i>
+            ${hidden ? 'Show code' : 'Hide code'}
+          </button>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block mb-4" id="btn-submit-code">
+          <i class="fa-solid fa-check"></i>
+          Submit Code
+        </button>
       </form>
+
+      <div class="keypad" id="keypad" aria-label="Code keypad">
+        ${keypadButtons}
+      </div>
     </div>
   `;
 }
@@ -289,7 +263,7 @@ export function renderManualEntry({ value = '', errorMsg = '' } = {}) {
    ========================================================================== */
 
 export function renderCelebration() {
-  const confettiColors = ['#CD866E', '#EEB8A6', '#010A27', '#FEE6DE'];
+  const confettiColors = ['#CD866E', '#EEB8A6', '#010A27', '#FDE5D5'];
   let confetti = '';
   for (let i = 0; i < 24; i++) {
     const left = Math.random() * 100;
@@ -302,8 +276,10 @@ export function renderCelebration() {
   return `
     <div class="celebration-overlay" role="alert" id="celebration-overlay">
       ${confetti}
-      <img src="${ASSET.character}" alt="" class="celebration-char" />
-      <h2 style="font-size:1.5rem;">🎉 Stamp Added!</h2>
+      <div class="celebration-stamp-icon">
+        <i class="${STAMP_ICON_CLASS}"></i>
+      </div>
+      <h2 style="font-size:1.5rem;">Stamp Added!</h2>
       <p style="font-weight:700; opacity:0.75;">Thank you for choosing Divika Cakes!</p>
     </div>
   `;
@@ -315,7 +291,7 @@ export function renderCelebration() {
 
 export function renderReward({ profile, stamps }) {
   const codesHtml = stamps
-    .map((s) => `<span class="code-chip">${escapeHtml(s.code)}</span>`)
+    .map((s) => `<span class="code-chip"><i class="fa-solid ${STAMP_ICON_CLASS.replace('fa-solid ', '')}"></i>${escapeHtml(s.code)}</span>`)
     .join('');
 
   return `
@@ -327,23 +303,25 @@ export function renderReward({ profile, stamps }) {
       </div>
 
       <div class="text-center mb-4">
-        <img src="${ASSET.character}" alt="" style="width:120px;height:120px;object-fit:contain;margin:0 auto 12px;" />
-        <h1 style="font-size:1.6rem;">🎉 Surprise Unlocked!</h1>
+        <div class="code-hero-icon" style="margin:0 auto 12px; width:110px; height:110px; font-size:2.6rem;">
+          <i class="fa-solid fa-gift"></i>
+        </div>
+        <h1 style="font-size:1.6rem;">Surprise Unlocked!</h1>
         <p style="font-weight:700; opacity:0.75; margin-top:4px;">Congratulations, ${escapeHtml((profile.name || '').split(' ')[0] || 'friend')}!</p>
         <p class="text-muted" style="font-weight:600;">Your surprise gift is ready.</p>
       </div>
 
       <div class="card mb-4">
         <div class="reward-detail-row">
-          <span class="label" style="font-weight:700; opacity:0.6;">Name</span>
+          <span class="label" style="font-weight:700; opacity:0.6;"><i class="fa-solid fa-user" style="color:var(--accent); margin-right:6px;"></i>Name</span>
           <span style="font-weight:700;">${escapeHtml(profile.name)}</span>
         </div>
         <div class="reward-detail-row">
-          <span class="label" style="font-weight:700; opacity:0.6;">Phone</span>
+          <span class="label" style="font-weight:700; opacity:0.6;"><i class="fa-solid fa-phone" style="color:var(--accent); margin-right:6px;"></i>Phone</span>
           <span style="font-weight:700;">${escapeHtml(profile.phone)}</span>
         </div>
         <div style="padding-top:12px;">
-          <span class="label" style="font-weight:700; opacity:0.6; font-size:0.9rem;">Collected Codes</span>
+          <span class="label" style="font-weight:700; opacity:0.6; font-size:0.9rem;"><i class="fa-solid fa-stamp" style="color:var(--accent); margin-right:6px;"></i>Collected Codes</span>
           <div class="code-chip-list">${codesHtml}</div>
         </div>
       </div>
@@ -354,7 +332,8 @@ export function renderReward({ profile, stamps }) {
       </button>
 
       <button class="btn btn-secondary btn-block" id="btn-confirm-redemption">
-        Confirm Redemption &amp; Reset Card
+        <i class="fa-solid fa-rotate"></i>
+        Confirm Redemption and Reset Card
       </button>
     </div>
   `;
@@ -363,9 +342,11 @@ export function renderReward({ profile, stamps }) {
 export function renderResetConfirmation() {
   return `
     <div class="celebration-overlay" role="status" id="reset-overlay">
-      <img src="${ASSET.character}" alt="" class="celebration-char" />
+      <div class="celebration-stamp-icon">
+        <i class="fa-solid fa-rotate"></i>
+      </div>
       <h2 style="font-size:1.4rem;">Your loyalty card has been reset.</h2>
-      <p style="font-weight:700; opacity:0.75;">Start collecting your next 6 stamps! 🍰</p>
+      <p style="font-weight:700; opacity:0.75;">Start collecting your next 6 stamps!</p>
     </div>
   `;
 }
@@ -374,7 +355,7 @@ export function renderResetConfirmation() {
    Profile / Settings screen
    ========================================================================== */
 
-export function renderProfile({ profile, stampCount, completedCount, editing = false, errors = {} }) {
+export function renderProfile({ profile, stampCount, completedCount, editing = false, errors = {}, avatar = null }) {
   const initials = (profile.name || '?')
     .split(' ')
     .map((p) => p[0])
@@ -397,43 +378,48 @@ export function renderProfile({ profile, stampCount, completedCount, editing = f
   const profileBlock = editing ? `
     <form id="profile-edit-form" novalidate>
       <div class="field">
-        <label for="edit-name">Full name</label>
+        <label for="edit-name"><i class="fa-solid fa-user-pen" style="color:var(--accent); margin-right:6px;"></i>Full name</label>
         <input type="text" id="edit-name" name="name" value="${escapeHtml(profile.name)}" required />
-        ${errors.name ? `<span class="error">${escapeHtml(errors.name)}</span>` : ''}
+        ${errors.name ? `<span class="error"><i class="fa-solid fa-circle-exclamation"></i>${escapeHtml(errors.name)}</span>` : ''}
       </div>
       <div class="field">
-        <label for="edit-phone">Phone number</label>
+        <label for="edit-phone"><i class="fa-solid fa-phone" style="color:var(--accent); margin-right:6px;"></i>Phone number</label>
         <input type="tel" id="edit-phone" name="phone" value="${escapeHtml(profile.phone)}" inputmode="numeric" required />
-        ${errors.phone ? `<span class="error">${escapeHtml(errors.phone)}</span>` : ''}
+        ${errors.phone ? `<span class="error"><i class="fa-solid fa-circle-exclamation"></i>${escapeHtml(errors.phone)}</span>` : ''}
       </div>
       <div class="field">
-        <label id="edit-gender-label">Gender</label>
+        <label id="edit-gender-label"><i class="fa-solid fa-venus-mars" style="color:var(--accent); margin-right:6px;"></i>Gender</label>
         <div class="radio-group" role="radiogroup" aria-labelledby="edit-gender-label">${genderChips}</div>
       </div>
       <div class="flex-row gap-3">
-        <button type="submit" class="btn btn-primary btn-block">Save</button>
-        <button type="button" class="btn btn-secondary btn-block" id="btn-cancel-edit">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-block"><i class="fa-solid fa-check"></i>Save</button>
+        <button type="button" class="btn btn-secondary btn-block" id="btn-cancel-edit"><i class="fa-solid fa-xmark"></i>Cancel</button>
       </div>
     </form>
   ` : `
     <div class="card mb-4">
       <div class="info-row">
-        <span class="label">Name</span>
+        <span class="label"><i class="fa-solid fa-user"></i>Name</span>
         <span class="value">${escapeHtml(profile.name)}</span>
       </div>
       <div class="info-row">
-        <span class="label">Phone</span>
+        <span class="label"><i class="fa-solid fa-phone"></i>Phone</span>
         <span class="value">${escapeHtml(profile.phone)}</span>
       </div>
       <div class="info-row">
-        <span class="label">Gender</span>
+        <span class="label"><i class="fa-solid fa-venus-mars"></i>Gender</span>
         <span class="value">${escapeHtml(profile.gender)}</span>
       </div>
     </div>
     <button class="btn btn-secondary btn-block mb-5" id="btn-edit-profile">
-      <i class="fa-solid fa-pen"></i>&nbsp; Edit profile
+      <i class="fa-solid fa-pen"></i>
+      Edit profile
     </button>
   `;
+
+  const avatarInner = avatar
+    ? `<img src="${avatar}" alt="Your profile photo" />`
+    : (initials ? escapeHtml(initials) : `<i class="fa-solid fa-user"></i>`);
 
   return `
     <div class="screen">
@@ -441,50 +427,107 @@ export function renderProfile({ profile, stampCount, completedCount, editing = f
         <h2 style="font-size:1.3rem;">Profile</h2>
       </div>
 
-      <div class="profile-avatar">${escapeHtml(initials) || '🍰'}</div>
+      <div class="profile-avatar-wrap">
+        <div class="profile-avatar" id="profile-avatar">${avatarInner}</div>
+        <button class="avatar-edit-btn" id="btn-edit-avatar" aria-label="Change profile photo">
+          <i class="fa-solid fa-camera"></i>
+        </button>
+      </div>
 
-      <h3 class="section-title">Your details</h3>
+      <h3 class="section-title"><i class="fa-solid fa-id-card"></i>Your details</h3>
       ${profileBlock}
 
-      <h3 class="section-title">Loyalty information</h3>
+      <h3 class="section-title"><i class="fa-solid fa-chart-simple"></i>Loyalty information</h3>
       <div class="card mb-5">
         <div class="info-row">
-          <span class="label">Current stamps</span>
+          <span class="label"><i class="fa-solid fa-stamp"></i>Current stamps</span>
           <span class="value">${stampCount} / ${MAX_STAMPS}</span>
         </div>
         <div class="info-row">
-          <span class="label">Remaining stamps</span>
+          <span class="label"><i class="fa-solid fa-hourglass-half"></i>Remaining stamps</span>
           <span class="value">${Math.max(0, MAX_STAMPS - stampCount)}</span>
         </div>
         <div class="info-row">
-          <span class="label">Cards redeemed</span>
+          <span class="label"><i class="fa-solid fa-trophy"></i>Cards redeemed</span>
           <span class="value">${completedCount}</span>
         </div>
       </div>
 
-      <h3 class="section-title">Terms &amp; conditions</h3>
+      <h3 class="section-title"><i class="fa-solid fa-file-lines"></i>Terms and conditions</h3>
       <div class="card mb-5">
         <ul class="terms-list">
-          <li>One stamp per bento cake purchase.</li>
-          <li>Two stamps per 500gm cake purchase.</li>
-          <li>Your Stampie account must be presented at the time of purchase.</li>
-          <li>Valid for regular cakes only.</li>
-          <li>Each cake code can only be redeemed once per loyalty cycle.</li>
-          <li>Six valid stamps unlock one surprise gift.</li>
-          <li>After the surprise gift is redeemed, the stamp counter resets to zero.</li>
-          <li>Stampie uses local device storage for this frontend-only implementation.</li>
+          <li><i class="fa-solid fa-circle-check"></i>One stamp per bento cake purchase.</li>
+          <li><i class="fa-solid fa-circle-check"></i>Two stamps per 500gm cake purchase.</li>
+          <li><i class="fa-solid fa-circle-check"></i>Your Stampie account must be presented at the time of purchase.</li>
+          <li><i class="fa-solid fa-circle-check"></i>Valid for regular cakes only.</li>
+          <li><i class="fa-solid fa-circle-check"></i>Each cake code can only be redeemed once per loyalty cycle.</li>
+          <li><i class="fa-solid fa-circle-check"></i>Six valid stamps unlock one surprise gift.</li>
+          <li><i class="fa-solid fa-circle-check"></i>After the surprise gift is redeemed, the stamp counter resets to zero.</li>
+          <li><i class="fa-solid fa-circle-check"></i>Stampie uses local device storage for this frontend-only implementation.</li>
         </ul>
       </div>
 
-      <h3 class="section-title">About</h3>
+      <h3 class="section-title"><i class="fa-solid fa-circle-info"></i>About</h3>
       <div class="card text-center">
-        <div class="about-logo-row">
-          <img src="${ASSET.finalLogo}" alt="Stampie" />
-          <img src="${ASSET.character}" alt="" />
+        <div class="about-logo-circle">
+          <img src="${ASSET.character}" alt="Stampie character logo" />
         </div>
         <p class="text-muted" style="font-weight:600; font-size:0.92rem;">
           Stampie is the digital loyalty card for Divika Cakes. Collect stamps with your cake purchases and unlock a sweet surprise!
         </p>
+      </div>
+    </div>
+  `;
+}
+
+/* ==========================================================================
+   Avatar photo-source bottom sheet (camera / gallery picker)
+   ========================================================================== */
+
+export function renderAvatarSheet({ hasAvatar = false } = {}) {
+  return `
+    <div class="sheet-backdrop" id="avatar-sheet-backdrop">
+      <div class="sheet-panel" id="avatar-sheet-panel" role="dialog" aria-modal="true" aria-label="Change profile photo">
+        <div class="sheet-handle"></div>
+        <h3 class="sheet-title">Profile photo</h3>
+        <div class="sheet-options">
+          <button type="button" class="sheet-option" id="avatar-option-camera">
+            <span class="sheet-option-icon"><i class="fa-solid fa-camera"></i></span>
+            Take a photo
+          </button>
+          <button type="button" class="sheet-option" id="avatar-option-gallery">
+            <span class="sheet-option-icon"><i class="fa-solid fa-images"></i></span>
+            Choose from gallery
+          </button>
+          ${hasAvatar ? `
+          <button type="button" class="sheet-option sheet-option-remove" id="avatar-option-remove">
+            <span class="sheet-option-icon"><i class="fa-solid fa-trash"></i></span>
+            Remove photo
+          </button>` : ''}
+        </div>
+        <button type="button" class="sheet-cancel" id="avatar-sheet-cancel">Cancel</button>
+        <input type="file" id="avatar-file-camera" accept="image/*" capture="environment" style="display:none;" />
+        <input type="file" id="avatar-file-gallery" accept="image/*" style="display:none;" />
+      </div>
+    </div>
+  `;
+}
+
+/* ==========================================================================
+   Custom confirm dialog
+   ========================================================================== */
+
+export function renderDialog({ icon = 'fa-circle-question', title = '', message = '', confirmLabel = 'Confirm', cancelLabel = 'Cancel', danger = false } = {}) {
+  return `
+    <div class="dialog-backdrop" id="dialog-backdrop">
+      <div class="dialog-panel" role="alertdialog" aria-modal="true" aria-label="${escapeHtml(title)}">
+        <div class="dialog-icon"><i class="fa-solid ${icon}"></i></div>
+        <h3 class="dialog-title">${escapeHtml(title)}</h3>
+        <p class="dialog-msg">${escapeHtml(message)}</p>
+        <div class="dialog-actions">
+          <button type="button" class="btn btn-secondary btn-block" id="dialog-cancel">${escapeHtml(cancelLabel)}</button>
+          <button type="button" class="btn btn-primary btn-block" id="dialog-confirm" style="${danger ? 'background:var(--danger);' : ''}">${escapeHtml(confirmLabel)}</button>
+        </div>
       </div>
     </div>
   `;
@@ -501,8 +544,8 @@ export function renderBottomNav(activeTab) {
         <i class="fa-solid fa-gift"></i>
         <span>Collection</span>
       </button>
-      <button class="nav-item nav-item-scan" id="nav-scan" aria-label="Scan cake code">
-        <i class="fa-solid fa-qrcode"></i>
+      <button class="nav-item nav-item-scan" id="nav-scan" aria-label="Enter cake code">
+        <i class="fa-solid fa-keyboard"></i>
       </button>
       <button class="nav-item ${activeTab === 'profile' ? 'is-active' : ''}" id="nav-profile" aria-label="Profile">
         <i class="fa-solid fa-user"></i>
@@ -513,7 +556,7 @@ export function renderBottomNav(activeTab) {
 }
 
 /* ==========================================================================
-   Toast
+   Toast (fully custom, never a browser default)
    ========================================================================== */
 
 let toastTimeout = null;
@@ -528,8 +571,10 @@ export function showToast(message, type = 'default') {
     document.body.appendChild(el);
   }
 
+  const icon = type === 'success' ? 'fa-circle-check' : type === 'error' ? 'fa-circle-exclamation' : 'fa-bell';
+
   el.className = `toast is-visible ${type === 'success' ? 'toast-success' : type === 'error' ? 'toast-error' : ''}`;
-  el.textContent = message;
+  el.innerHTML = `<i class="fa-solid ${icon} toast-icon"></i><span>${escapeHtml(message)}</span>`;
 
   if (toastTimeout) clearTimeout(toastTimeout);
   toastTimeout = setTimeout(() => {

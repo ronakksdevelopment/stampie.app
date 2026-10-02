@@ -1,5 +1,5 @@
 /**
- * Stampie — Code Validation
+ * Stampie - Code Validation
  * ---------------------------------------------------------------------------
  * Loads valid cake codes from data/codes.json and validates scanned/entered
  * codes against that list and against the customer's already-used codes.
@@ -63,8 +63,8 @@ export const ValidationResult = {
 
 /**
  * Validates and (if valid) redeems a code: adds a stamp to the active card.
- * Returns { result, code } — result is one of ValidationResult.
- * This is the single entry point used by BOTH the QR scanner and manual entry.
+ * Returns { result, code }. result is one of ValidationResult.
+ * This is the single entry point used by manual code entry.
  */
 export async function redeemCode(rawCode) {
   const code = normalizeCode(rawCode);
@@ -102,13 +102,13 @@ export function messageForResult(result) {
     case ValidationResult.SUCCESS:
       return 'Stamp added! Thank you for choosing Divika Cakes!';
     case ValidationResult.INVALID_FORMAT:
-      return "That code doesn't look right. It should be 6 letters/numbers.";
+      return 'That code does not look right. It should be 6 letters or numbers.';
     case ValidationResult.NOT_FOUND:
-      return "Hmm... we couldn't find that cake code.";
+      return 'We could not find that cake code.';
     case ValidationResult.ALREADY_USED:
       return 'This code has already been used.';
     case ValidationResult.CARD_FULL:
-      return 'Your card is already full — unlock your surprise!';
+      return 'Your card is already full, unlock your surprise!';
     case ValidationResult.LOAD_ERROR:
     default:
       return 'Something went wrong. Please try again.';

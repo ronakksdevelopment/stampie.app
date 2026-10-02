@@ -4,7 +4,7 @@ The digital loyalty card for **Divika Cakes**. Customers collect a stamp for eve
 cake code they scan (printed on the cake box), and unlock a surprise gift after
 6 stamps.
 
-Built as a frontend-only, installable Progressive Web App — no backend, no
+Built as a frontend-only, installable Progressive Web App - no backend, no
 server, no database. It runs entirely in the customer's browser using
 LocalStorage.
 
@@ -51,7 +51,7 @@ over your local network, use a tool like `ngrok` or deploy to GitHub Pages
 
 ## 🧾 Adding cake QR codes
 
-Cake codes live in **`data/codes.json`** — a simple JSON array of strings.
+Cake codes live in **`data/codes.json`** - a simple JSON array of strings.
 
 ```json
 [
@@ -67,7 +67,7 @@ Rules:
 - Each code can only be redeemed once per customer, per loyalty cycle.
 
 To add new codes, just open `data/codes.json` and append new strings to the
-array (keep it valid JSON — commas between entries, no trailing comma on the
+array (keep it valid JSON - commas between entries, no trailing comma on the
 last one).
 
 ### Generating codes automatically
@@ -88,7 +88,7 @@ The generator avoids easily-confused characters (`O`/`0`, `I`/`1`) for easier
 manual entry by customers.
 
 Each cake box's QR code should simply encode the plain code string (e.g.
-`A7K2P9`) — any QR generator (online or offline) works for printing.
+`A7K2P9`) - any QR generator (online or offline) works for printing.
 
 ---
 
@@ -103,7 +103,7 @@ Three images live in `assets/`:
 | `text_banner.png` | 2:1 | Decorative banner on the home screen |
 
 To replace them, swap the files in `assets/` **keeping the same filenames and
-aspect ratios** — the layout is built around those proportions. If you change
+aspect ratios** - the layout is built around those proportions. If you change
 the character artwork, also regenerate the app icons (see below).
 
 ### Regenerating app icons
@@ -130,7 +130,7 @@ EOF
 
 ## 🏗️ Build
 
-There is no build step — this is plain HTML/CSS/JS with ES modules, served
+There is no build step - this is plain HTML/CSS/JS with ES modules, served
 directly. Just deploy the folder as-is.
 
 ---
@@ -144,7 +144,7 @@ directly. Just deploy the folder as-is.
 
 Because this project uses **relative paths** throughout (`./assets/...`,
 `./src/...`, `./data/codes.json`), it works correctly whether it's hosted at
-a domain root or in a subdirectory like GitHub Pages' repo-name path — no
+a domain root or in a subdirectory like GitHub Pages' repo-name path - no
 extra base-path configuration needed.
 
 After deploying, open the site on a mobile browser and use "Add to Home
@@ -168,7 +168,7 @@ This app is intentionally frontend-only, with **no backend server**:
   the shop owner except via the WhatsApp message sent at redemption time,
   and will be lost if the customer clears their browser data or switches
   devices.
-- There is no authentication — anyone with the app installed can enter any
+- There is no authentication - anyone with the app installed can enter any
   valid code they find.
 
 These trade-offs are appropriate for a lightweight, low-stakes loyalty

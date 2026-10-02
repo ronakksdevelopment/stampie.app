@@ -1,5 +1,5 @@
 /**
- * Stampie — Storage Layer
+ * Stampie - Storage Layer
  * ---------------------------------------------------------------------------
  * A single abstraction over LocalStorage so the rest of the app never
  * touches localStorage directly. Keeps the data model documented in one
@@ -7,6 +7,7 @@
  */
 
 const STORAGE_KEY = 'stampie_state_v1';
+const AVATAR_STORAGE_KEY = 'stampie_avatar_v1';
 
 const DEFAULT_STATE = {
   profile: {
@@ -161,9 +162,42 @@ export const Storage = {
   clearAll() {
     try {
       window.localStorage.removeItem(STORAGE_KEY);
+      window.localStorage.removeItem(AVATAR_STORAGE_KEY);
       return true;
     } catch (err) {
       console.error('Stampie: failed to clear storage', err);
+      return false;
+    }
+  },
+
+  /** Read the saved profile photo as a data URL, or null if none set. */
+  getAvatar() {
+    try {
+      return window.localStorage.getItem(AVATAR_STORAGE_KEY) || null;
+    } catch (err) {
+      console.error('Stampie: failed to read avatar', err);
+      return null;
+    }
+  },
+
+  /** Save a profile photo as a data URL. */
+  saveAvatar(dataUrl) {
+    try {
+      window.localStorage.setItem(AVATAR_STORAGE_KEY, dataUrl);
+      return true;
+    } catch (err) {
+      console.error('Stampie: failed to save avatar (it may be too large)', err);
+      return false;
+    }
+  },
+
+  /** Remove the saved profile photo. */
+  clearAvatar() {
+    try {
+      window.localStorage.removeItem(AVATAR_STORAGE_KEY);
+      return true;
+    } catch (err) {
+      console.error('Stampie: failed to clear avatar', err);
       return false;
     }
   },
