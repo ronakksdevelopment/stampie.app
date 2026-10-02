@@ -30,6 +30,49 @@ let codeHidden = false;
 let codeSubmitting = false;
 
 /* ==========================================================================
+   Install-to-device (PWA) prompt handling
+   ========================================================================== */
+
+let deferredInstallPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+});
+
+window.addEventListener('appinstalled', () => {
+  deferredInstallPrompt = null;
+});
+
+function isStandaloneDisplay() {
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+
+async function triggerInstall() {
+  if (isStandaloneDisplay()) {
+    showToast('Stampie is already installed.', 'default');
+    return;
+  }
+
+  if (deferredInstallPrompt) {
+    deferredInstallPrompt.prompt();
+    const { outcome } = await deferredInstallPrompt.userChoice;
+    deferredInstallPrompt = null;
+    if (outcome === 'accepted') {
+      showToast('Stampie installed!', 'success');
+    }
+    return;
+  }
+
+  const isIos = /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+  if (isIos) {
+    showToast('Tap Share, then "Add to Home Screen" to install.', 'default');
+  } else {
+    showToast('Use your browser menu and choose "Install app" or "Add to Home Screen".', 'default');
+  }
+}
+
+/* ==========================================================================
    Validation helpers
    ========================================================================== */
 
@@ -176,6 +219,10 @@ function wireHome() {
       goTo('reward');
     }
   });
+
+  document.getElementById('btn-install-app')?.addEventListener('click', () => {
+    triggerInstall();
+  });
 }
 
 /* ==========================================================================
@@ -284,38 +331,23 @@ function wireManualEntry(extra) {
 function wireReward() {
   document.getElementById('btn-back-from-reward')?.addEventListener('click', () => goTo('collection'));
 
-  document.getElementById('btn-contact-gift')?.addEventListener('click', () => {
-    const profile = Storage.getProfile();
-    const stamps = Storage.getActiveLoyalty().stamps;
-    const codesList = stamps.map((s, i) => `${i + 1}. ${s.code}`).join('\n');
-
-    const message = [
-      'Hello Divika Cakes!',
-      'A customer has completed their Stampie loyalty card.',
-      '',
-      `Name: ${profile.name}`,
-      `Phone: ${profile.phone}`,
-      '',
-      'Collected Codes:',
-      codesList,
-      '',
-      'Surprise gift is ready for collection.',
-    ].join('\n');
-
-    import('./constants.js').then(({ REWARD_CONTACT }) => {
-      const url = `https://wa.me/${REWARD_CONTACT}?text=${encodeURIComponent(message)}`;
-      window.open(url, '_blank', 'noopener');
-    });
-  });
-
   document.getElementById('btn-confirm-redemption')?.addEventListener('click', () => {
     showConfirmDialog({
       icon: 'fa-rotate',
-      title: 'Reset your card?',
-      message: 'This will confirm your redemption and start a fresh card at 0 stamps.',
-      confirmLabel: 'Yes, reset it',
+      title: 'Confirm reset redemption?',
+      message: 'This will notify Divika Cakes on WhatsApp and start a fresh card at 0 stamps. Your codes will be cleared from the app.',
+      confirmLabel: 'Yes, confirm',
       cancelLabel: 'Not yet',
       onConfirm: () => {
+        // No codes are ever included in the WhatsApp message or logged anywhere.
+        const message = 'Hi, I completed all 6 loyalty stamps.';
+
+        import('./constants.js').then(({ REWARD_CONTACT }) => {
+          const url = `https://wa.me/${REWARD_CONTACT}?text=${encodeURIComponent(message)}`;
+          window.open(url, '_blank', 'noopener');
+        });
+
+        // Clears the active card's codes from the app immediately.
         Storage.redeemAndReset();
 
         const overlay = document.createElement('div');

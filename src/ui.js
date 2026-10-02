@@ -21,34 +21,6 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
-function formatDate(iso) {
-  if (!iso) return '';
-  try {
-    return new Date(iso).toLocaleDateString(undefined, {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-  } catch {
-    return '';
-  }
-}
-
-/* ==========================================================================
-   Splash screen
-   ========================================================================== */
-
-export function renderSplash() {
-  return `
-    <div class="splash-screen" role="status" aria-label="Loading Stampie">
-      <img src="${ASSET.finalLogo}" alt="Stampie" class="splash-logo" />
-      <div class="splash-dots" aria-hidden="true">
-        <span></span><span></span><span></span>
-      </div>
-    </div>
-  `;
-}
-
 /* ==========================================================================
    Onboarding
    ========================================================================== */
@@ -150,8 +122,11 @@ export function renderHome({ profile, stampCount, completedCount }) {
   return `
     <div class="screen">
       <div class="top-bar">
-        <img src="${ASSET.finalLogo}" alt="Stampie" class="logo-mark" />
+        <span class="top-bar-spacer" aria-hidden="true"></span>
         ${completedCount > 0 ? `<span class="text-muted" style="font-size:0.82rem; font-weight:700; display:flex; align-items:center; gap:6px;"><i class="fa-solid fa-trophy" style="color:var(--accent);"></i>${completedCount} redeemed</span>` : ''}
+        <button type="button" class="icon-btn install-btn" id="btn-install-app" aria-label="Install app" title="Install app">
+          <i class="fa-solid fa-arrow-up-from-bracket"></i>
+        </button>
       </div>
 
       <img src="${ASSET.banner}" alt="Divika Cakes" class="banner-art" />
@@ -290,7 +265,7 @@ export function renderCelebration() {
 
 export function renderReward({ profile, stamps }) {
   const codesHtml = stamps
-    .map((s) => `<span class="code-chip"><i class="fa-solid ${STAMP_ICON_CLASS.replace('fa-solid ', '')}"></i>${escapeHtml(s.code)}</span>`)
+    .map(() => `<span class="code-chip code-chip-hidden"><i class="fa-solid fa-lock"></i>&bull;&bull;&bull;&bull;&bull;&bull;</span>`)
     .join('');
 
   return `
@@ -325,14 +300,9 @@ export function renderReward({ profile, stamps }) {
         </div>
       </div>
 
-      <button class="btn btn-primary btn-block mb-3" id="btn-contact-gift">
+      <button type="button" class="btn btn-primary btn-block" id="btn-confirm-redemption">
         <i class="fa-brands fa-whatsapp"></i>
-        Contact for Gift
-      </button>
-
-      <button class="btn btn-secondary btn-block" id="btn-confirm-redemption">
-        <i class="fa-solid fa-rotate"></i>
-        Confirm Redemption and Reset Card
+        Confirm Reset Redemption
       </button>
     </div>
   `;
@@ -581,4 +551,4 @@ export function showToast(message, type = 'default') {
   }, 2800);
 }
 
-export { ASSET, escapeHtml, formatDate };
+

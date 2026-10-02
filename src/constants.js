@@ -5,17 +5,6 @@
 export const MAX_STAMPS = 6;
 export const CODE_LENGTH = 6;
 export const REWARD_CONTACT = '918837005091'; // WhatsApp wants digits only, country code first
-export const REWARD_CONTACT_DISPLAY = '+91 88370 05091';
-
-export const COLORS = {
-  bg: '#FDE5D5',
-  highlight: '#EEB8A6',
-  accent: '#CD866E',
-  ink: '#010A27',
-};
-
-export const STORAGE_KEY = 'stampie_state_v1';
-export const AVATAR_STORAGE_KEY = 'stampie_avatar_v1';
 
 export const GENDER_OPTIONS = ['Male', 'Female', 'Other', 'Prefer not to say'];
 

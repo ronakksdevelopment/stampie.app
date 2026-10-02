@@ -128,15 +128,17 @@ export const Storage = {
     return loadState().activeLoyalty.stamps.length;
   },
 
-  /** Record a completed redemption into history, then reset the active card. */
+  /** Record a completed redemption into history, then reset the active card.
+   *  Codes are intentionally NOT stored in history — once entered and
+   *  redeemed, codes are fully removed from the app. */
   redeemAndReset() {
     const state = loadState();
     const completedAt = new Date().toISOString();
-    const codes = state.activeLoyalty.stamps.map((s) => s.code);
+    const stampCount = state.activeLoyalty.stamps.length;
 
     state.history.push({
       completedAt,
-      codes,
+      stampCount,
       customerName: state.profile.name,
       customerPhone: state.profile.phone,
     });
