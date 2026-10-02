@@ -266,7 +266,7 @@ export function renderCelebration() {
 
 export function renderReward({ profile, stamps }) {
   const codesHtml = stamps
-    .map(() => `<span class="code-chip code-chip-hidden"><i class="fa-solid fa-lock"></i>&bull;&bull;&bull;&bull;&bull;&bull;</span>`)
+    .map((_, i) => `<span class="code-chip code-chip-hidden"><i class="fa-solid fa-lock"></i>${String(i + 1).padStart(2, '0')}</span>`)
     .join('');
 
   return `
