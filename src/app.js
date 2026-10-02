@@ -7,7 +7,7 @@
 
 import { Storage } from './storage.js';
 import { redeemCode, normalizeCode, ValidationResult, messageForResult } from './codes.js';
-import { MAX_STAMPS, CODE_LENGTH } from './constants.js';
+import { MAX_STAMPS, CODE_LENGTH, REWARD_CONTACT } from './constants.js';
 import {
   renderOnboarding,
   renderHome,
@@ -342,11 +342,11 @@ function wireReward() {
       onConfirm: () => {
         // No codes are ever included in the WhatsApp message or logged anywhere.
         const message = 'Hi, I completed all 6 loyalty stamps.';
+        const url = `https://wa.me/${REWARD_CONTACT}?text=${encodeURIComponent(message)}`;
 
-        import('./constants.js').then(({ REWARD_CONTACT }) => {
-          const url = `https://wa.me/${REWARD_CONTACT}?text=${encodeURIComponent(message)}`;
-          window.open(url, '_blank', 'noopener');
-        });
+        // Must be called synchronously within the user-gesture click handler,
+        // or mobile browsers silently block the popup (this was the bug).
+        window.open(url, '_blank', 'noopener');
 
         // Clears the active card's codes from the app immediately.
         Storage.redeemAndReset();
