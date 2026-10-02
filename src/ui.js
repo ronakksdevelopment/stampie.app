@@ -512,7 +512,7 @@ export function renderDialog({ icon = 'fa-circle-question', title = '', message 
 function installButtonHtml() {
   return `
     <button type="button" class="icon-btn install-btn" id="btn-install-app" aria-label="Install app" title="Install app">
-      <i class="fa-solid fa-arrow-up-from-bracket"></i>
+      <i class="fa-solid fa-download"></i>
     </button>
   `;
 }
