@@ -1,4 +1,4 @@
-# Stampie
+# Stampie 🎂
 
 The digital loyalty card for **Divika Cakes**. Customers collect a stamp for every
 cake code they enter (printed on the cake box), and unlock a surprise gift after
