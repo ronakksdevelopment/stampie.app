@@ -124,7 +124,7 @@ export function renderHome({ profile, stampCount, completedCount }) {
       <div class="top-bar">
         <span class="top-bar-spacer" aria-hidden="true"></span>
         ${completedCount > 0 ? `<span class="text-muted" style="font-size:0.82rem; font-weight:700; display:flex; align-items:center; gap:6px;"><i class="fa-solid fa-trophy" style="color:var(--accent);"></i>${completedCount} redeemed</span>` : ''}
-        <span class="top-bar-spacer" aria-hidden="true"></span>
+        ${installButtonHtml()}
       </div>
 
       <img src="${ASSET.banner}" alt="Divika Cakes" class="banner-art" />
@@ -193,9 +193,12 @@ export function renderManualEntry({ value = '', errorMsg = '', hidden = false } 
     <div class="screen" style="display:flex; flex-direction:column;">
       <div class="top-bar">
         <h2 style="font-size:1.3rem;">Enter your code</h2>
-        <button class="icon-btn" id="btn-close-manual" aria-label="Close">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
+        <div class="top-bar-actions">
+          ${installButtonHtml()}
+          <button class="icon-btn" id="btn-close-manual" aria-label="Close">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
       </div>
 
       <div class="code-hero mb-5">
@@ -272,6 +275,7 @@ export function renderReward({ profile, stamps }) {
         <button class="icon-btn" id="btn-back-from-reward" aria-label="Back">
           <i class="fa-solid fa-arrow-left"></i>
         </button>
+        ${installButtonHtml()}
       </div>
 
       <div class="text-center mb-4">
@@ -392,6 +396,7 @@ export function renderProfile({ profile, stampCount, completedCount, editing = f
     <div class="screen">
       <div class="top-bar">
         <h2 style="font-size:1.3rem;">Profile</h2>
+        ${installButtonHtml()}
       </div>
 
       <div class="profile-avatar-wrap">
@@ -501,12 +506,12 @@ export function renderDialog({ icon = 'fa-circle-question', title = '', message 
 }
 
 /* ==========================================================================
-   Floating install button - rendered once, stays fixed on every screen
+   Install button (inline, placed in each screen's own top-bar)
    ========================================================================== */
 
-export function renderInstallButton() {
+function installButtonHtml() {
   return `
-    <button type="button" class="install-btn-floating" id="btn-install-app" aria-label="Install app" title="Install app">
+    <button type="button" class="icon-btn install-btn" id="btn-install-app" aria-label="Install app" title="Install app">
       <i class="fa-solid fa-arrow-up-from-bracket"></i>
     </button>
   `;

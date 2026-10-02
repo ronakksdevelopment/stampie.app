@@ -380,27 +380,15 @@ a { color: inherit; }
   flex-shrink: 0;
 }
 
-.install-btn-floating {
-  position: fixed;
-  top: calc(16px + var(--safe-top));
-  right: max(16px, calc((100vw - 480px) / 2 + 16px));
-  width: 44px;
-  height: 44px;
-  border-radius: var(--radius-md);
-  background: var(--white);
-  border: none;
+.top-bar-actions {
   display: flex;
   align-items: center;
-  justify-content: center;
-  color: var(--ink);
-  font-size: 1.1rem;
-  box-shadow: var(--shadow-soft);
-  z-index: 60;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  gap: var(--space-2);
 }
 
-.install-btn-floating:hover { box-shadow: var(--shadow-pop); }
-.install-btn-floating:active { transform: scale(0.93); }
+.install-btn {
+  flex-shrink: 0;
+}
 
 .icon-btn {
   background: var(--white);

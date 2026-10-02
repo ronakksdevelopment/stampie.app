@@ -19,7 +19,6 @@ import {
   renderAvatarSheet,
   renderDialog,
   renderBottomNav,
-  renderInstallButton,
   showToast,
 } from './ui.js';
 
@@ -201,6 +200,11 @@ function wireCurrentTab(extra) {
   document.getElementById('nav-collection')?.addEventListener('click', () => goTo('collection'));
   document.getElementById('nav-scan')?.addEventListener('click', () => goTo('manual'));
   document.getElementById('nav-profile')?.addEventListener('click', () => goTo('profile'));
+
+  // Install button is re-rendered inline on every screen's own top-bar
+  document.getElementById('btn-install-app')?.addEventListener('click', () => {
+    triggerInstall();
+  });
 
   if (currentTab === 'collection') {
     wireHome();
@@ -593,19 +597,8 @@ function playCelebration() {
    Boot
    ========================================================================== */
 
-function mountInstallButton() {
-  if (document.getElementById('btn-install-app')) return;
-  const wrapper = document.createElement('div');
-  wrapper.innerHTML = renderInstallButton();
-  document.body.appendChild(wrapper.firstElementChild);
-  document.getElementById('btn-install-app')?.addEventListener('click', () => {
-    triggerInstall();
-  });
-}
-
 function boot() {
   renderApp();
-  mountInstallButton();
 
   // Register service worker for PWA/offline support
   if ('serviceWorker' in navigator) {
