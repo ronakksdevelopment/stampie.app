@@ -265,9 +265,6 @@ export function renderCelebration() {
    ========================================================================== */
 
 export function renderReward({ profile, stamps }) {
-  const codesHtml = stamps
-    .map((_, i) => `<span class="code-chip code-chip-hidden"><i class="fa-solid fa-lock"></i>${String(i + 1).padStart(2, '0')}</span>`)
-    .join('');
 
   return `
     <div class="screen screen--no-nav" id="reward-screen">
@@ -296,9 +293,9 @@ export function renderReward({ profile, stamps }) {
           <span class="label" style="font-weight:700; opacity:0.6;"><i class="fa-solid fa-phone" style="color:var(--accent); margin-right:6px;"></i>Phone</span>
           <span style="font-weight:700;">${escapeHtml(profile.phone)}</span>
         </div>
-        <div style="padding-top:12px;">
-          <span class="label" style="font-weight:700; opacity:0.6; font-size:0.9rem;"><i class="fa-solid fa-stamp" style="color:var(--accent); margin-right:6px;"></i>Collected Codes</span>
-          <div class="code-chip-list">${codesHtml}</div>
+        <div class="reward-detail-row" style="border-bottom:none; padding-top:12px;">
+          <span class="label" style="font-weight:700; opacity:0.6;"><i class="fa-solid fa-stamp" style="color:var(--accent); margin-right:6px;"></i>Codes Collected</span>
+          <span style="font-weight:700;">${stamps.length}</span>
         </div>
       </div>
 
